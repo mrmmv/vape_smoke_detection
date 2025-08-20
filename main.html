@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smoking Detection Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #001f3f;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .top-nav .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .top-nav h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .top-nav .menu-btn {
+            position: absolute;
+            left: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: #001f3f;
+            transition: left 0.3s ease;
+            z-index: 99;
+            padding-top: 60px;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(50% - 40px);
+            max-width: calc(50% - 40px);
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #001f3f;
+            color: white;
+        }
+
+        #recent-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            cursor: pointer;
+            object-fit: cover;
+        }
+
+        .view-all-btn {
+            background: #001f3f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .view-all-btn:hover {
+            background: #003366;
+        }
+
+        /* Developer Info Modal */
+        .developer-info {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 101;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .developer-info.open {
+            display: block;
+        }
+
+        .developer-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .developer-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .developer-details {
+            flex: 1;
+        }
+
+        .developer-details p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .close-dev-info {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-modal.open {
+            display: flex;
+        }
+
+        .settings-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .camera-settings {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .add-camera-btn {
+            background: #001f3f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .remove-camera-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .save-settings-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #001f3f;
+            color: white;
+            margin-top: 20px;
+        }
+
+        /* Type Badges */
+        .type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .type-smoking {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+
+        .type-carrying {
+            background-color: #cce5ff;
+            color: #0066cc;
+        }
+        
+        .item-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .item-cigarette {
+            background-color: #ffddcc;
+            color: #cc5500;
+        }
+
+        .item-vape {
+            background-color: #ccddff;
+            color: #0044cc;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .card {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .top-nav h1 {
+                font-size: 1.2em;
+            }
+
+            .developer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .developer-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <img src="https://cdn-icons-png.flaticon.com/256/998/998699.png" alt="Logo" class="logo">
+        <h1>Smoking Detection Dashboard</h1>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <button onclick="showSettings()">
+            <img src="https://cdn-icons-png.flaticon.com/512/126/126472.png" alt="Settings Icon">
+            Settings
+        </button>
+        <button onclick="showDeveloperInfo()">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Developer Info Icon">
+            Developer Info
+        </button>
+        <button onclick="logout()">
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="Logout Icon">
+            Logout
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="card">
+            <h2>Detection History</h2>
+            <table class="data-table" id="data-history-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Item</th>
+                        <th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body"></tbody>
+            </table>
+            <button class="view-all-btn" onclick="viewAllData()">View All</button>
+        </div>
+
+        <div class="card">
+            <h2>Recent Detection</h2>
+            <img id="recent-image" src="" alt="Recent Image">
+            <p id="recent-image-time"></p>
+            <p id="recent-image-location"></p>
+            <p id="recent-image-type"></p>
+            <p id="recent-image-item"></p>
+            <button class="view-all-btn" onclick="viewAllImages()">View All</button>
+        </div>
+
+        <div class="card">
+            <h2>Detection Statistics</h2>
+            <div id="stats-container">
+                <p>Total Detections: <span id="total-detections">0</span></p>
+                <p>Smoking Detections: <span id="smoking-detections">0</span></p>
+                <p>Carrying Detections: <span id="carrying-detections">0</span></p>
+                <p>Cigarette Detections: <span id="cigarette-detections">0</span></p>
+                <p>Vape Detections: <span id="vape-detections">0</span></p>
+                <p>Last Detection: <span id="last-detection-time">Never</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Info Modal -->
+    <div class="developer-info" id="developer-info">
+        <span class="close-dev-info" onclick="closeDeveloperInfo()">&times;</span>
+        <h2>Developer Information</h2>
+        <div class="developer-content">
+            <img src="src/pic.png" alt="Developer Image" class="developer-image">
+            <div class="developer-details">
+                <p><strong>Name:</strong> Jaspher Andy E. Castillo</p>
+                <p><strong>Email:</strong> jasphercastillo8@gmail.com</p>
+                <p><strong>Phone:</strong> +639510378115</p>
+                <p><strong>Role:</strong> Developer</p>
+                <p><strong>About:</strong> Jaspher is a computer engineering student with passion in designing and developing smart surveillance system to detect cigarette smoking.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal">
+        <div class="settings-content">
+            <span class="close" onclick="closeSettingsModal()">&times;</span>
+            <h2>System Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="alert-phone">Alert Phone Number:</label>
+                    <input type="text" id="alert-phone" placeholder="+639123456789">
+                </div>
+                
+                <h3>Camera Configuration</h3>
+                <div id="camera-settings-container">
+                    <!-- Camera settings will be added here dynamically -->
+                </div>
+                <button class="add-camera-btn" onclick="addCameraSetting()">Add Camera</button>
+                <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data History Modal -->
+    <div id="data-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDataModal()">&times;</span>
+            <h2>All Detection History</h2>
+            <table class="data-table" id="all-data-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Item</th>
+                        <th>Confidence</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody id="all-data-table-body"></tbody>
+            </table>
+            <button class="view-all-btn" onclick="downloadData()">Download Data</button>
+        </div>
+    </div>
+
+    <!-- Images Modal -->
+    <div id="images-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeImagesModal()">&times;</span>
+            <h2>All Detection Images</h2>
+            <div class="image-grid" id="image-grid"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Powered by: AI Smoking Detection © 2025
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCK7sNHt1NCAdT5Oh3UyqANkXmNNSbc138",
+            authDomain: "smoke-detection-3c903.firebaseapp.com",
+            databaseURL: "https://smoke-detection-3c903-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "smoke-detection-3c903",
+            storageBucket: "smoke-detection-3c903.firebasestorage.app",
+            messagingSenderId: "934647950927",
+            appId: "1:934647950927:web:ecb337451b9a8b6c2f043a"
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Camera settings
+        let cameraSettings = [];
+        let currentCameraId = 0;
+
+        function fetchDashboardData() {
+            const dataRef = db.ref('smoking_events');
+            dataRef.orderByChild('timestamp').limitToLast(5).on('value', (snapshot) => {
+                const data = snapshot.val();
+                const tableBody = document.getElementById('data-table-body');
+                tableBody.innerHTML = '';
+                
+                if (data) {
+                    const entries = Object.entries(data).reverse();
+                    
+                    entries.forEach(([key, entry]) => {
+                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const typeBadge = getTypeBadge(entry.offense_type);
+                        const itemBadge = getItemBadge(entry.offense_details?.item);
+                        
+                        const row = `<tr>
+                                        <td>${formatDateTime(entry.timestamp)}</td>
+                                        <td>${entry.location}</td>
+                                        <td>${typeBadge}</td>
+                                        <td>${itemBadge}</td>
+                                        <td>${confidencePercent}%</td>
+                                    </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    // Update recent image
+                    if (entries.length > 0) {
+                        const recentData = entries[0][1];
+                        document.getElementById('recent-image').src = `data:image/jpeg;base64,${recentData.image_base64}`;
+                        document.getElementById('recent-image-time').innerText = `Captured on: ${formatDateTime(recentData.timestamp)}`;
+                        document.getElementById('recent-image-location').innerText = `Location: ${recentData.location}`;
+                        document.getElementById('recent-image-type').innerHTML = `Type: ${getTypeBadge(recentData.offense_type)}`;
+                        document.getElementById('recent-image-item').innerHTML = `Item: ${getItemBadge(recentData.offense_details?.item)}`;
+                    }
+                    
+                    // Update statistics
+                    updateStatistics(data);
+                }
+            });
+        }
+
+        function updateStatistics(data) {
+            const entries = Object.values(data);
+            const totalDetections = entries.length;
+            const smokingDetections = entries.filter(entry => entry.offense_type === 'smoking').length;
+            const carryingDetections = entries.filter(entry => entry.offense_type === 'carrying').length;
+            const cigaretteDetections = entries.filter(entry => 
+                entry.offense_details && entry.offense_details.item === 'cigarette').length;
+            const vapeDetections = entries.filter(entry => 
+                entry.offense_details && entry.offense_details.item === 'vape').length;
+            
+            // Get the latest detection time
+            let lastDetectionTime = 'Never';
+            if (entries.length > 0) {
+                const timestamps = entries.map(entry => new Date(entry.timestamp));
+                const latestTimestamp = new Date(Math.max(...timestamps));
+                lastDetectionTime = formatDateTime(latestTimestamp);
+            }
+            
+            document.getElementById('total-detections').innerText = totalDetections;
+            document.getElementById('smoking-detections').innerText = smokingDetections;
+            document.getElementById('carrying-detections').innerText = carryingDetections;
+            document.getElementById('cigarette-detections').innerText = cigaretteDetections;
+            document.getElementById('vape-detections').innerText = vapeDetections;
+            document.getElementById('last-detection-time').innerText = lastDetectionTime;
+        }
+
+        function getTypeBadge(type) {
+            if (!type) return '';
+            
+            const classMap = {
+                'smoking': 'type-smoking',
+                'carrying': 'type-carrying'
+            };
+            
+            return `<span class="type-badge ${classMap[type] || ''}">${type}</span>`;
+        }
+
+        function getItemBadge(item) {
+            if (!item) return 'N/A';
+            
+            const classMap = {
+                'cigarette': 'item-cigarette',
+                'vape': 'item-vape'
+            };
+            
+            return `<span class="item-badge ${classMap[item] || ''}">${item}</span>`;
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function viewAllData() {
+            const dataRef = db.ref('smoking_events');
+            dataRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                const tableBody = document.getElementById('all-data-table-body');
+                tableBody.innerHTML = '';
+                
+                if (data) {
+                    Object.entries(data).reverse().forEach(([key, entry]) => {
+                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const typeBadge = getTypeBadge(entry.offense_type);
+                        const itemBadge = getItemBadge(entry.offense_details?.item);
+                        
+                        const row = `<tr>
+                                        <td>${formatDateTime(entry.timestamp)}</td>
+                                        <td>${entry.location}</td>
+                                        <td>${typeBadge}</td>
+                                        <td>${itemBadge}</td>
+                                        <td>${confidencePercent}%</td>
+                                        <td><img src="data:image/jpeg;base64,${entry.image_base64}" style="width:50px;cursor:pointer;" onclick="showFullImage('${entry.image_base64}')"></td>
+                                    </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                }
+                
+                document.getElementById('data-modal').classList.add('open');
+            });
+        }
+
+        function viewAllImages() {
+            const dataRef = db.ref('smoking_events');
+            dataRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                const imageGrid = document.getElementById('image-grid');
+                imageGrid.innerHTML = '';
+                
+                if (data) {
+                    Object.entries(data).reverse().forEach(([key, entry]) => {
+                        const imageContainer = document.createElement('div');
+                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const typeBadge = getTypeBadge(entry.offense_type);
+                        const itemBadge = getItemBadge(entry.offense_details?.item);
+                        
+                        imageContainer.innerHTML = `
+                            <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image">
+                            <p>${formatDateTime(entry.timestamp)}</p>
+                            <p>${entry.location}</p>
+                            <p>${typeBadge} ${itemBadge} ${confidencePercent}%</p>
+                            <button class="download-btn" onclick="downloadImage('${entry.image_base64}', '${entry.timestamp}', ${entry.confidence}, '${entry.offense_type}', '${entry.offense_details?.item}')">Download</button>
+                        `;
+                        imageGrid.appendChild(imageContainer);
+                    });
+                }
+                
+                document.getElementById('images-modal').classList.add('open');
+            });
+        }
+
+        function showFullImage(imageBase64) {
+            const modal = document.createElement('div');
+            modal.className = 'modal open';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align:center;">
+                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <img src="data:image/jpeg;base64,${imageBase64}" style="max-width:100%;max-height:80vh;">
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function downloadImage(imageBase64, timestamp, confidence, type, item) {
+            const link = document.createElement('a');
+            link.href = `data:image/jpeg;base64,${imageBase64}`;
+            const confidencePercent = (confidence * 100).toFixed(2);
+            const cleanTimestamp = timestamp.replace(/[: ]/g, '_').replace(/\./g, '-');
+            link.download = `Smoking_${type}_${item || 'unknown'}_${cleanTimestamp}_${confidencePercent}pc.jpg`;
+            link.click();
+        }
+
+        function downloadData() {
+            const table = document.getElementById('all-data-table');
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Detection History");
+            XLSX.writeFile(wb, "detection_history.xlsx");
+        }
+
+        function closeDataModal() {
+            document.getElementById('data-modal').classList.remove('open');
+        }
+
+        function closeImagesModal() {
+            document.getElementById('images-modal').classList.remove('open');
+        }
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function showDeveloperInfo() {
+            const devInfo = document.getElementById('developer-info');
+            devInfo.classList.add('open');
+        }
+
+        function closeDeveloperInfo() {
+            const devInfo = document.getElementById('developer-info');
+            devInfo.classList.remove('open');
+        }
+
+        function showSettings() {
+            // Load current settings
+            db.ref('alert_settings').once('value').then((snapshot) => {
+                const settings = snapshot.val();
+                if (settings) {
+                    document.getElementById('alert-phone').value = settings.phone_number || '';
+                }
+                
+                return db.ref('camera_settings').once('value');
+            }).then((snapshot) => {
+                const settings = snapshot.val();
+                const container = document.getElementById('camera-settings-container');
+                container.innerHTML = '';
+                
+                if (settings) {
+                    cameraSettings = Object.entries(settings).map(([id, setting]) => {
+                        return { id, ...setting };
+                    });
+                    
+                    cameraSettings.forEach((setting, index) => {
+                        addCameraSettingToUI(setting, index);
+                    });
+                } else {
+                    // Add default camera if none exist
+                    addCameraSetting();
+                }
+                
+                document.getElementById('settings-modal').classList.add('open');
+            }).catch(error => {
+                console.error("Error loading settings:", error);
+            });
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('open');
+        }
+
+        function addCameraSetting() {
+            const newSetting = {
+                id: `camera_${Date.now()}`,
+                location: '',
+                camera_index: cameraSettings.length
+            };
+            cameraSettings.push(newSetting);
+            addCameraSettingToUI(newSetting, cameraSettings.length - 1);
+        }
+
+        function addCameraSettingToUI(setting, index) {
+            const container = document.getElementById('camera-settings-container');
+            const settingDiv = document.createElement('div');
+            settingDiv.className = 'camera-settings';
+            settingDiv.id = `camera-${setting.id}`;
+            
+            settingDiv.innerHTML = `
+                <h4>Camera ${index + 1}</h4>
+                <div class="form-group">
+                    <label for="location-${setting.id}">Location:</label>
+                    <input type="text" id="location-${setting.id}" value="${setting.location || ''}" placeholder="Enter camera location">
+                </div>
+                <div class="form-group">
+                    <label for="index-${setting.id}">Camera Index:</label>
+                    <select id="index-${setting.id}">
+                        ${Array.from({length: 4}, (_, i) => 
+                            `<option value="${i}" ${i === setting.camera_index ? 'selected' : ''}>${i}</option>`).join('')}
+                    </select>
+                </div>
+                <button class="remove-camera-btn" onclick="removeCameraSetting('${setting.id}')">Remove Camera</button>
+            `;
+            
+            container.appendChild(settingDiv);
+        }
+
+        function removeCameraSetting(id) {
+            if (confirm('Are you sure you want to remove this camera?')) {
+                cameraSettings = cameraSettings.filter(setting => setting.id !== id);
+                const element = document.getElementById(`camera-${id}`);
+                if (element) element.remove();
+            }
+        }
+
+        function saveSettings() {
+            const phoneNumber = document.getElementById('alert-phone').value;
+            const updates = {};
+            
+            // Save phone number
+            updates['alert_settings/phone_number'] = phoneNumber;
+            
+            // Save camera settings
+            cameraSettings.forEach(setting => {
+                const location = document.getElementById(`location-${setting.id}`).value;
+                const index = parseInt(document.getElementById(`index-${setting.id}`).value);
+                
+                updates[`camera_settings/${setting.id}/location`] = location;
+                updates[`camera_settings/${setting.id}/camera_index`] = index;
+            });
+            
+            // Remove deleted cameras
+            db.ref('camera_settings').once('value').then((snapshot) => {
+                const existingSettings = snapshot.val() || {};
+                const existingIds = Object.keys(existingSettings);
+                const currentIds = cameraSettings.map(c => c.id);
+                
+                existingIds.forEach(id => {
+                    if (!currentIds.includes(id)) {
+                        updates[`camera_settings/${id}`] = null;
+                    }
+                });
+                
+                return db.ref().update(updates);
+            }).then(() => {
+                alert('Settings saved successfully!');
+                closeSettingsModal();
+            }).catch(error => {
+                alert('Error saving settings: ' + error.message);
+            });
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+
+        window.onload = () => {
+            fetchDashboardData();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+       
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f3f2f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-box, .register-box, .reset-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .login-box:hover, .register-box:hover, .reset-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo {
+            width: 120px;
+    		margin: 0 auto; 
+    		display: block; 
+    		margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #616161;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0078d4;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #006cbd;
+            transform: translateY(-1px);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 4px;
+            margin: 16px 0;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.error {
+            background-color: #fde7e9;
+            border: 1px solid #d13438;
+            color: #d13438;
+        }
+
+        .message.success {
+            background-color: #dff6dd;
+            border: 1px solid #107c10;
+            color: #107c10;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .link a {
+            color: #0078d4;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #0078d4;
+            transition: width 0.3s ease;
+        }
+
+        .link a:hover::after {
+            width: 100%;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #616161;
+            font-size: 12px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 120, 212, 0.2);
+            border-top-color: #0078d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .login-box, .register-box, .reset-box {
+                padding: 24px;
+            }
+            
+            h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Login Box -->
+    <div class="login-box" id="login-box">
+        <img src="src/logo.png" alt="Logo" class="logo">
+       
+        <div class="input-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="Enter your email" required>
+        </div>
+        <div class="input-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password" required>
+        </div>
+        <button onclick="loginUser()">Sign In</button>
+        <div class="spinner" id="login-spinner"></div>
+        <div class="message" id="login-message"></div>
+        <div class="link">
+            <a href="#" onclick="showReset()">Forgot password?</a>
+        </div>
+        <!-- Add the "Create Account" link here -->
+        <div class="link">
+            <a href="#" onclick="showRegister()">Create new account</a>
+        </div>
+    </div>
+
+    <!-- Register Box -->
+    <div class="register-box" id="register-box" style="display: none;">
+        <img src="src/logo.png" alt="Microsoft Logo" class="logo">
+        <h2>Create Account</h2>
+        <div class="input-group">
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" placeholder="Enter your email" required>
+        </div>
+        <div class="input-group">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" placeholder="Create a password" required>
+        </div>
+        <button onclick="registerUser()">Create Account</button>
+        <div class="spinner" id="register-spinner"></div>
+        <div class="message" id="register-message"></div>
+        <div class="link">
+            <a href="#" onclick="showLogin()">Already have an account? Sign In</a>
+        </div>
+    </div>
+
+    <!-- Reset Box -->
+    <div class="reset-box" id="reset-box" style="display: none;">
+        <img src="src/logo.png" alt="Microsoft Logo" class="logo">
+        <h2>Reset Password</h2>
+        <div class="input-group">
+            <label for="reset-email">Email</label>
+            <input type="email" id="reset-email" placeholder="Enter your email" required>
+        </div>
+        <button onclick="resetPassword()">Reset Password</button>
+        <div class="spinner" id="reset-spinner"></div>
+        <div class="message" id="reset-message"></div>
+        <div class="link">
+            <a href="#" onclick="showLogin()">Return to Sign In</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Smoking Detection</p>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+         apiKey: "AIzaSyAOfqqhTLKTIgXjtdk2SV_0Y_o7oWhAl9g",
+  authDomain: "smoking-detection-50088.firebaseapp.com",
+  databaseURL: "https://smoking-detection-50088-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smoking-detection-50088",
+  storageBucket: "smoking-detection-50088.firebasestorage.app",
+  messagingSenderId: "699864093199",
+  appId: "1:699864093199:web:c220b7fb86d84f1560897a"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Prevent back button navigation
+    history.pushState(null, null, location.href);
+    window.onpopstate = function() {
+        history.go(1);
+    };
+
+    // Show message function
+    function showMessage(elementId, message, type) {
+        const messageElement = document.getElementById(elementId);
+        messageElement.textContent = message;
+        messageElement.className = `message ${type}`;
+        messageElement.style.display = 'block';
+        setTimeout(() => {
+            messageElement.style.display = 'none';
+        }, 5000);
+    }
+
+    // Form navigation functions
+    function showReset() {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('register-box').style.display = 'none';
+        document.getElementById('reset-box').style.display = 'block';
+    }
+
+    function showRegister() {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('register-box').style.display = 'block';
+        document.getElementById('reset-box').style.display = 'none';
+    }
+
+    function showLogin() {
+        document.getElementById('login-box').style.display = 'block';
+        document.getElementById('register-box').style.display = 'none';
+        document.getElementById('reset-box').style.display = 'none';
+    }
+
+    // Firebase error handling
+    function getFriendlyError(error) {
+        switch(error.code) {
+            case 'auth/invalid-login-credentials':
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+                return 'Invalid email or password';
+            case 'auth/email-already-in-use':
+                return 'Email already registered';
+            case 'auth/weak-password':
+                return 'Password must be at least 6 characters';
+           case 'auth/invalid-email':
+                return 'Email address is badly formatted';
+         default:
+                return 'An error occurred. Please try again';
+            
+        }
+    }
+
+    // Auth functions
+    async function loginUser() {
+        const spinner = document.getElementById('login-spinner');
+        try {
+            spinner.style.display = 'block';
+            const userCredential = await auth.signInWithEmailAndPassword(
+                document.getElementById('login-email').value,
+                document.getElementById('login-password').value
+            );
+            window.location.href = "main.html";
+        } catch (error) {
+            showMessage('login-message', getFriendlyError(error), 'error');
+        } finally {
+            spinner.style.display = 'none';
+        }
+    }
+
+    async function registerUser() {
+        const spinner = document.getElementById('register-spinner');
+        try {
+            spinner.style.display = 'block';
+            await auth.createUserWithEmailAndPassword(
+                document.getElementById('register-email').value,
+                document.getElementById('register-password').value
+            );
+            showMessage('register-message', "Registration successful!", 'success');
+        } catch (error) {
+            showMessage('register-message', getFriendlyError(error), 'error');
+        } finally {
+            spinner.style.display = 'none';
+        }
+    }
+
+    async function resetPassword() {
+        const spinner = document.getElementById('reset-spinner');
+        try {
+            spinner.style.display = 'block';
+            await auth.sendPasswordResetEmail(document.getElementById('reset-email').value);
+            showMessage('reset-message', "Password reset email sent!", 'success');
+        } catch (error) {
+            showMessage('reset-message', getFriendlyError(error), 'error');
+        } finally {
+            spinner.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
