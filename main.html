@@ -4,289 +4,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smoking Detection Dashboard</title>
+    <meta name="theme-color" content="#001f3f">
+    <title>Smoking Detection</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/256/998/998699.png" type="image/png">
     <style>
         /* General Styles */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            background: #f0f2f5;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
             color: #333;
+            overscroll-behavior: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* App Container */
+        .app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Status Bar (for Android) */
+        .status-bar {
+            height: 24px;
+            background: #001a33;
+            width: 100%;
         }
 
         /* Top Navigation Bar */
         .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             background: #001f3f;
-            padding: 10px 20px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             z-index: 100;
         }
 
         .top-nav .logo {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
         }
 
         .top-nav h1 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 1.2rem;
             color: white;
+            font-weight: 500;
+            flex: 1;
         }
 
         .top-nav .menu-btn {
-            position: absolute;
-            left: 20px;
             background: none;
             border: none;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.5rem;
             cursor: pointer;
+            padding: 4px;
+            margin-right: 8px;
         }
 
-        /* Sidebar Menu */
-        .sidebar {
+        /* Bottom Navigation Bar */
+        .bottom-nav {
             position: fixed;
-            top: 0;
-            left: -250px;
-            width: 250px;
-            height: 100%;
-            background: #001f3f;
-            transition: left 0.3s ease;
-            z-index: 99;
-            padding-top: 60px;
-        }
-
-        .sidebar.open {
+            bottom: 0;
             left: 0;
-        }
-
-        .sidebar button {
-            display: block;
             width: 100%;
-            padding: 15px;
-            text-align: left;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background 0.3s ease;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
         }
 
-        .sidebar button:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.75rem;
+            padding: 4px 12px;
         }
 
-        .sidebar button img {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
+        .nav-item.active {
+            color: #001f3f;
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
         }
 
         /* Main Content */
         .main-content {
-            margin-top: 70px;
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 70px; /* Space for bottom nav */
         }
 
         .card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            flex: 1 1 calc(50% - 40px);
-            max-width: calc(50% - 40px);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .card h2 {
             margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            color: #001f3f;
+            font-weight: 500;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.85rem;
         }
 
         .data-table th,
         .data-table td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: left;
         }
 
         .data-table th {
-            background-color: #001f3f;
-            color: white;
+            background-color: #f5f5f5;
+            color: #333;
+            font-weight: 500;
         }
 
         #recent-image {
             width: 100%;
             height: auto;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             object-fit: cover;
+            margin-bottom: 12px;
         }
 
         .view-all-btn {
             background: #001f3f;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
             width: 100%;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
-        .view-all-btn:hover {
+        .view-all-btn:active {
             background: #003366;
         }
 
-        /* Developer Info Modal */
-        .developer-info {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 101;
-            width: 90%;
-            max-width: 600px;
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
-        .developer-info.open {
-            display: block;
+        .stat-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
         }
 
-        .developer-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #001f3f;
+            margin: 4px 0;
         }
 
-        .developer-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .developer-details {
-            flex: 1;
-        }
-
-        .developer-details p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .close-dev-info {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5em;
-            cursor: pointer;
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
         }
 
         /* Modals */
-        .modal {
-            display: none;
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 100;
+            display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .modal.open {
-            display: flex;
+            z-index: 1000;
+            padding: 16px;
         }
 
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
             max-height: 80vh;
-            overflow-y: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .close {
-            float: right;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-
-        /* Image Grid */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .image-grid img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        /* Settings Modal */
-        .settings-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .settings-modal.open {
+        .modal-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 32px;
+            height: 32px;
             display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .settings-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
+        .modal-body {
+            padding: 16px;
             overflow-y: auto;
+            flex: 1;
         }
 
+        /* Developer Info */
+        .developer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .developer-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            object-fit: cover;
+        }
+
+        .developer-details {
+            width: 100%;
+        }
+
+        .developer-details p {
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+
+        /* Settings */
         .settings-form {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
         }
 
         .form-group {
@@ -295,68 +304,91 @@
         }
 
         .form-group label {
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .form-group input, .form-group select {
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1rem;
         }
 
         .camera-settings {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .add-camera-btn, .remove-camera-btn, .save-settings-btn {
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .add-camera-btn {
             background: #001f3f;
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
+            width: 100%;
+            margin-top: 8px;
         }
 
         .remove-camera-btn {
             background: #f44336;
             color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
+            width: 100%;
+            margin-top: 8px;
         }
 
         .save-settings-btn {
             background: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
+            width: 100%;
+            margin-top: 16px;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #001f3f;
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .image-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            margin-top: 20px;
+            padding: 8px;
+            font-size: 0.75rem;
         }
 
         /* Type Badges */
         .type-badge {
             display: inline-block;
-            padding: 3px 8px;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.8em;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
@@ -372,11 +404,11 @@
         
         .item-badge {
             display: inline-block;
-            padding: 3px 8px;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.8em;
+            font-size: 0.75rem;
             font-weight: bold;
-            margin-left: 5px;
+            margin-left: 4px;
         }
 
         .item-cigarette {
@@ -389,172 +421,272 @@
             color: #0044cc;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
+        /* Swipeable tabs */
+        .tabs-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
 
-            .card {
-                flex: 1 1 100%;
-                max-width: 100%;
-            }
+        .tabs-header {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
 
-            .top-nav h1 {
-                font-size: 1.2em;
-            }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 2px solid transparent;
+        }
 
-            .developer-content {
-                flex-direction: column;
-                text-align: center;
-            }
+        .tab.active {
+            color: #001f3f;
+            border-bottom: 2px solid #001f3f;
+        }
 
-            .developer-image {
-                width: 100px;
-                height: 100px;
-            }
+        .tabs-content {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+
+        .tab-content {
+            min-width: 100%;
+            padding: 16px;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #001f3f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: #ccc;
         }
     </style>
 </head>
 
 <body>
-    <!-- Top Navigation Bar -->
-    <div class="top-nav">
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <img src="https://cdn-icons-png.flaticon.com/256/998/998699.png" alt="Logo" class="logo">
-        <h1>Smoking Detection Dashboard</h1>
-    </div>
-
-    <!-- Sidebar Menu -->
-    <div class="sidebar" id="sidebar">
-        <button onclick="showSettings()">
-            <img src="https://cdn-icons-png.flaticon.com/512/126/126472.png" alt="Settings Icon">
-            Settings
-        </button>
-        <button onclick="showDeveloperInfo()">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Developer Info Icon">
-            Developer Info
-        </button>
-        <button onclick="logout()">
-            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="Logout Icon">
-            Logout
-        </button>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="card">
-            <h2>Detection History</h2>
-            <table class="data-table" id="data-history-table">
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Location</th>
-                        <th>Type</th>
-                        <th>Item</th>
-                        <th>Confidence</th>
-                    </tr>
-                </thead>
-                <tbody id="data-table-body"></tbody>
-            </table>
-            <button class="view-all-btn" onclick="viewAllData()">View All</button>
+    <div class="app-container">
+        <!-- Status Bar (simulated) -->
+        <div class="status-bar"></div>
+        
+        <!-- Top Navigation Bar -->
+        <div class="top-nav">
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+            <img src="https://cdn-icons-png.flaticon.com/256/998/998699.png" alt="Logo" class="logo">
+            <h1>Smoking Detection</h1>
         </div>
 
-        <div class="card">
-            <h2>Recent Detection</h2>
-            <img id="recent-image" src="" alt="Recent Image">
-            <p id="recent-image-time"></p>
-            <p id="recent-image-location"></p>
-            <p id="recent-image-type"></p>
-            <p id="recent-image-item"></p>
-            <button class="view-all-btn" onclick="viewAllImages()">View All</button>
-        </div>
-
-        <div class="card">
-            <h2>Detection Statistics</h2>
-            <div id="stats-container">
-                <p>Total Detections: <span id="total-detections">0</span></p>
-                <p>Smoking Detections: <span id="smoking-detections">0</span></p>
-                <p>Carrying Detections: <span id="carrying-detections">0</span></p>
-                <p>Cigarette Detections: <span id="cigarette-detections">0</span></p>
-                <p>Vape Detections: <span id="vape-detections">0</span></p>
-                <p>Last Detection: <span id="last-detection-time">Never</span></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Developer Info Modal -->
-    <div class="developer-info" id="developer-info">
-        <span class="close-dev-info" onclick="closeDeveloperInfo()">&times;</span>
-        <h2>Developer Information</h2>
-        <div class="developer-content">
-            <img src="src/pic.png" alt="Developer Image" class="developer-image">
-            <div class="developer-details">
-                <p><strong>Name:</strong> Jaspher Andy E. Castillo</p>
-                <p><strong>Email:</strong> jasphercastillo8@gmail.com</p>
-                <p><strong>Phone:</strong> +639510378115</p>
-                <p><strong>Role:</strong> Developer</p>
-                <p><strong>About:</strong> Jaspher is a computer engineering student with passion in designing and developing smart surveillance system to detect cigarette smoking.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="settings-modal">
-        <div class="settings-content">
-            <span class="close" onclick="closeSettingsModal()">&times;</span>
-            <h2>System Settings</h2>
-            <div class="settings-form">
-                <div class="form-group">
-                    <label for="alert-phone">Alert Phone Number:</label>
-                    <input type="text" id="alert-phone" placeholder="+639123456789">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Detection History Card -->
+            <div class="card">
+                <h2>Recent Detections</h2>
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <div class="tab active" onclick="switchTab(0)">List</div>
+                        <div class="tab" onclick="switchTab(1)">Map</div>
+                    </div>
+                    <div class="tabs-content" id="tabs-content">
+                        <div class="tab-content">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table" id="data-history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Location</th>
+                                            <th>Type</th>
+                                            <th>Confidence</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="data-table-body"></tbody>
+                                </table>
+                            </div>
+                            <button class="view-all-btn" onclick="viewAllData()">View All History</button>
+                        </div>
+                        <div class="tab-content">
+                            <div class="empty-state">
+                                <div class="empty-icon">🗺️</div>
+                                <p>Map view will be available soon</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <h3>Camera Configuration</h3>
-                <div id="camera-settings-container">
-                    <!-- Camera settings will be added here dynamically -->
+            </div>
+
+            <!-- Recent Detection Card -->
+            <div class="card">
+                <h2>Latest Detection</h2>
+                <img id="recent-image" src="" alt="Recent Image" onclick="viewAllImages()">
+                <div id="recent-image-info">
+                    <p id="recent-image-time"></p>
+                    <p id="recent-image-location"></p>
+                    <p id="recent-image-type"></p>
+                    <p id="recent-image-item"></p>
                 </div>
-                <button class="add-camera-btn" onclick="addCameraSetting()">Add Camera</button>
-                <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+                <button class="view-all-btn" onclick="viewAllImages()">View All Images</button>
+            </div>
+
+            <!-- Detection Statistics Card -->
+            <div class="card">
+                <h2>Detection Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-detections">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="smoking-detections">0</div>
+                        <div class="stat-label">Smoking</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="carrying-detections">0</div>
+                        <div class="stat-label">Carrying</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="last-detection-time">-</div>
+                        <div class="stat-label">Last Detection</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="viewAllData(); return false;">
+                <span class="nav-icon">📋</span>
+                <span>History</span>
+            </a>
+            <a href="#" class="nav-item" onclick="viewAllImages(); return false;">
+                <span class="nav-icon">🖼️</span>
+                <span>Images</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSettings(); return false;">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <!-- Developer Info Modal -->
+        <div class="modal-overlay" id="developer-info-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Developer Information</h2>
+                    <button class="modal-close" onclick="closeModal('developer-info-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="developer-content">
+                        <img src="src/pic.png" alt="Developer Image" class="developer-image">
+                        <div class="developer-details">
+                            <p><strong>Name:</strong> Jaspher Andy E. Castillo</p>
+                            <p><strong>Email:</strong> jasphercastillo8@gmail.com</p>
+                            <p><strong>Phone:</strong> +639510378115</p>
+                            <p><strong>Role:</strong> Developer</p>
+                            <p><strong>About:</strong> Jaspher is a computer engineering student with passion in designing and developing smart surveillance system to detect cigarette smoking.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settings-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">System Settings</h2>
+                    <button class="modal-close" onclick="closeModal('settings-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="alert-phone">Alert Phone Number:</label>
+                            <input type="tel" id="alert-phone" placeholder="+639123456789">
+                        </div>
+                        
+                        <h3>Camera Configuration</h3>
+                        <div id="camera-settings-container">
+                            <!-- Camera settings will be added here dynamically -->
+                        </div>
+                        <button class="add-camera-btn" onclick="addCameraSetting()">Add Camera</button>
+                        <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data History Modal -->
+        <div class="modal-overlay" id="data-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">All Detection History</h2>
+                    <button class="modal-close" onclick="closeModal('data-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="all-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-data-table-body"></tbody>
+                        </table>
+                    </div>
+                    <button class="view-all-btn" onclick="downloadData()">Download Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Images Modal -->
+        <div class="modal-overlay" id="images-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">All Detection Images</h2>
+                    <button class="modal-close" onclick="closeModal('images-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="image-grid" id="image-grid"></div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Data History Modal -->
-    <div id="data-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDataModal()">&times;</span>
-            <h2>All Detection History</h2>
-            <table class="data-table" id="all-data-table">
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Location</th>
-                        <th>Type</th>
-                        <th>Item</th>
-                        <th>Confidence</th>
-                        <th>Image</th>
-                    </tr>
-                </thead>
-                <tbody id="all-data-table-body"></tbody>
-            </table>
-            <button class="view-all-btn" onclick="downloadData()">Download Data</button>
-        </div>
-    </div>
-
-    <!-- Images Modal -->
-    <div id="images-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeImagesModal()">&times;</span>
-            <h2>All Detection Images</h2>
-            <div class="image-grid" id="image-grid"></div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        Powered by: AI Smoking Detection © 2025
-    </footer>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -574,7 +706,23 @@
 
         // Camera settings
         let cameraSettings = [];
-        let currentCameraId = 0;
+        let currentTab = 0;
+
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            const tabsContent = document.getElementById('tabs-content');
+            tabsContent.style.transform = `translateX(-${tabIndex * 100}%)`;
+            
+            // Update active tab
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, index) => {
+                if (index === tabIndex) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }
 
         function fetchDashboardData() {
             const dataRef = db.ref('smoking_events');
@@ -587,15 +735,13 @@
                     const entries = Object.entries(data).reverse();
                     
                     entries.forEach(([key, entry]) => {
-                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const confidencePercent = (entry.confidence * 100).toFixed(0);
                         const typeBadge = getTypeBadge(entry.offense_type);
-                        const itemBadge = getItemBadge(entry.offense_details?.item);
                         
                         const row = `<tr>
-                                        <td>${formatDateTime(entry.timestamp)}</td>
+                                        <td>${formatTime(entry.timestamp)}</td>
                                         <td>${entry.location}</td>
                                         <td>${typeBadge}</td>
-                                        <td>${itemBadge}</td>
                                         <td>${confidencePercent}%</td>
                                     </tr>`;
                         tableBody.innerHTML += row;
@@ -605,7 +751,7 @@
                     if (entries.length > 0) {
                         const recentData = entries[0][1];
                         document.getElementById('recent-image').src = `data:image/jpeg;base64,${recentData.image_base64}`;
-                        document.getElementById('recent-image-time').innerText = `Captured on: ${formatDateTime(recentData.timestamp)}`;
+                        document.getElementById('recent-image-time').innerText = `Captured: ${formatDateTime(recentData.timestamp)}`;
                         document.getElementById('recent-image-location').innerText = `Location: ${recentData.location}`;
                         document.getElementById('recent-image-type').innerHTML = `Type: ${getTypeBadge(recentData.offense_type)}`;
                         document.getElementById('recent-image-item').innerHTML = `Item: ${getItemBadge(recentData.offense_details?.item)}`;
@@ -613,6 +759,8 @@
                     
                     // Update statistics
                     updateStatistics(data);
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No detection data available</td></tr>';
                 }
             });
         }
@@ -622,24 +770,18 @@
             const totalDetections = entries.length;
             const smokingDetections = entries.filter(entry => entry.offense_type === 'smoking').length;
             const carryingDetections = entries.filter(entry => entry.offense_type === 'carrying').length;
-            const cigaretteDetections = entries.filter(entry => 
-                entry.offense_details && entry.offense_details.item === 'cigarette').length;
-            const vapeDetections = entries.filter(entry => 
-                entry.offense_details && entry.offense_details.item === 'vape').length;
             
             // Get the latest detection time
-            let lastDetectionTime = 'Never';
+            let lastDetectionTime = '-';
             if (entries.length > 0) {
                 const timestamps = entries.map(entry => new Date(entry.timestamp));
                 const latestTimestamp = new Date(Math.max(...timestamps));
-                lastDetectionTime = formatDateTime(latestTimestamp);
+                lastDetectionTime = formatTime(latestTimestamp);
             }
             
             document.getElementById('total-detections').innerText = totalDetections;
             document.getElementById('smoking-detections').innerText = smokingDetections;
             document.getElementById('carrying-detections').innerText = carryingDetections;
-            document.getElementById('cigarette-detections').innerText = cigaretteDetections;
-            document.getElementById('vape-detections').innerText = vapeDetections;
             document.getElementById('last-detection-time').innerText = lastDetectionTime;
         }
 
@@ -671,6 +813,12 @@
             return date.toLocaleString();
         }
 
+        function formatTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString();
+        }
+
         function viewAllData() {
             const dataRef = db.ref('smoking_events');
             dataRef.once('value', (snapshot) => {
@@ -680,7 +828,7 @@
                 
                 if (data) {
                     Object.entries(data).reverse().forEach(([key, entry]) => {
-                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const confidencePercent = (entry.confidence * 100).toFixed(0);
                         const typeBadge = getTypeBadge(entry.offense_type);
                         const itemBadge = getItemBadge(entry.offense_details?.item);
                         
@@ -690,13 +838,14 @@
                                         <td>${typeBadge}</td>
                                         <td>${itemBadge}</td>
                                         <td>${confidencePercent}%</td>
-                                        <td><img src="data:image/jpeg;base64,${entry.image_base64}" style="width:50px;cursor:pointer;" onclick="showFullImage('${entry.image_base64}')"></td>
                                     </tr>`;
                         tableBody.innerHTML += row;
                     });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No detection data available</td></tr>';
                 }
                 
-                document.getElementById('data-modal').classList.add('open');
+                showModal('data-modal');
             });
         }
 
@@ -709,45 +858,27 @@
                 
                 if (data) {
                     Object.entries(data).reverse().forEach(([key, entry]) => {
-                        const imageContainer = document.createElement('div');
-                        const confidencePercent = (entry.confidence * 100).toFixed(2);
+                        const confidencePercent = (entry.confidence * 100).toFixed(0);
                         const typeBadge = getTypeBadge(entry.offense_type);
                         const itemBadge = getItemBadge(entry.offense_details?.item);
                         
-                        imageContainer.innerHTML = `
+                        const imageItem = document.createElement('div');
+                        imageItem.className = 'image-item';
+                        imageItem.innerHTML = `
                             <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image">
-                            <p>${formatDateTime(entry.timestamp)}</p>
-                            <p>${entry.location}</p>
-                            <p>${typeBadge} ${itemBadge} ${confidencePercent}%</p>
-                            <button class="download-btn" onclick="downloadImage('${entry.image_base64}', '${entry.timestamp}', ${entry.confidence}, '${entry.offense_type}', '${entry.offense_details?.item}')">Download</button>
+                            <div class="image-info">
+                                ${formatTime(entry.timestamp)}<br>
+                                ${typeBadge} ${itemBadge} ${confidencePercent}%
+                            </div>
                         `;
-                        imageGrid.appendChild(imageContainer);
+                        imageGrid.appendChild(imageItem);
                     });
+                } else {
+                    imageGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">🖼️</div><p>No images available</p></div>';
                 }
                 
-                document.getElementById('images-modal').classList.add('open');
+                showModal('images-modal');
             });
-        }
-
-        function showFullImage(imageBase64) {
-            const modal = document.createElement('div');
-            modal.className = 'modal open';
-            modal.innerHTML = `
-                <div class="modal-content" style="text-align:center;">
-                    <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <img src="data:image/jpeg;base64,${imageBase64}" style="max-width:100%;max-height:80vh;">
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function downloadImage(imageBase64, timestamp, confidence, type, item) {
-            const link = document.createElement('a');
-            link.href = `data:image/jpeg;base64,${imageBase64}`;
-            const confidencePercent = (confidence * 100).toFixed(2);
-            const cleanTimestamp = timestamp.replace(/[: ]/g, '_').replace(/\./g, '-');
-            link.download = `Smoking_${type}_${item || 'unknown'}_${cleanTimestamp}_${confidencePercent}pc.jpg`;
-            link.click();
         }
 
         function downloadData() {
@@ -758,27 +889,20 @@
             XLSX.writeFile(wb, "detection_history.xlsx");
         }
 
-        function closeDataModal() {
-            document.getElementById('data-modal').classList.remove('open');
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
         }
 
-        function closeImagesModal() {
-            document.getElementById('images-modal').classList.remove('open');
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
+            showDeveloperInfo();
         }
 
         function showDeveloperInfo() {
-            const devInfo = document.getElementById('developer-info');
-            devInfo.classList.add('open');
-        }
-
-        function closeDeveloperInfo() {
-            const devInfo = document.getElementById('developer-info');
-            devInfo.classList.remove('open');
+            showModal('developer-info-modal');
         }
 
         function showSettings() {
@@ -808,14 +932,10 @@
                     addCameraSetting();
                 }
                 
-                document.getElementById('settings-modal').classList.add('open');
+                showModal('settings-modal');
             }).catch(error => {
                 console.error("Error loading settings:", error);
             });
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settings-modal').classList.remove('open');
         }
 
         function addCameraSetting() {
@@ -892,19 +1012,47 @@
                 return db.ref().update(updates);
             }).then(() => {
                 alert('Settings saved successfully!');
-                closeSettingsModal();
+                closeModal('settings-modal');
             }).catch(error => {
                 alert('Error saving settings: ' + error.message);
             });
         }
 
         function logout() {
-            window.location.href = 'index.html';
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
         }
 
+        // Initialize the app
         window.onload = () => {
             fetchDashboardData();
+            switchTab(0);
         };
+
+        // Add touch events for swipeable tabs
+        let startX = 0;
+        let currentX = 0;
+        const tabsContent = document.getElementById('tabs-content');
+
+        tabsContent.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        tabsContent.addEventListener('touchmove', (e) => {
+            currentX = e.touches[0].clientX;
+        });
+
+        tabsContent.addEventListener('touchend', () => {
+            const diff = startX - currentX;
+            if (Math.abs(diff) > 50) { // Minimum swipe distance
+                if (diff > 0 && currentTab < 1) {
+                    switchTab(currentTab + 1);
+                } else if (diff < 0 && currentTab > 0) {
+                    switchTab(currentTab - 1);
+                }
+            }
+        });
     </script>
 </body>
 </html>
