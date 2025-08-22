@@ -491,6 +491,106 @@
             margin-bottom: 16px;
             color: #ccc;
         }
+        
+        /* Image Preview Modal */
+        .image-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .image-preview-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+        
+        .image-preview-actions {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .preview-action-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close-preview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Detection item in list */
+        .detection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detection-info {
+            flex: 1;
+        }
+        
+        .detection-time {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .detection-location {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .detection-badges {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .detection-confidence {
+            font-weight: bold;
+            color: #001f3f;
+        }
     </style>
 </head>
 
@@ -518,18 +618,11 @@
                     </div>
                     <div class="tabs-content" id="tabs-content">
                         <div class="tab-content">
-                            <div style="overflow-x: auto;">
-                                <table class="data-table" id="data-history-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Time</th>
-                                            <th>Location</th>
-                                            <th>Type</th>
-                                            <th>Confidence</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="data-table-body"></tbody>
-                                </table>
+                            <div id="detection-list">
+                                <!-- Detection items will be added here dynamically -->
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                </div>
                             </div>
                             <button class="view-all-btn" onclick="viewAllData()">View All History</button>
                         </div>
@@ -546,7 +639,7 @@
             <!-- Recent Detection Card -->
             <div class="card">
                 <h2>Latest Detection</h2>
-                <img id="recent-image" src="" alt="Recent Image" onclick="viewAllImages()">
+                <img id="recent-image" src="" alt="Recent Image" onclick="previewImage('recent')">
                 <div id="recent-image-info">
                     <p id="recent-image-time"></p>
                     <p id="recent-image-location"></p>
@@ -686,6 +779,19 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Image Preview Modal -->
+        <div class="image-preview-modal" id="image-preview-modal">
+            <div class="image-preview-content">
+                <img id="preview-image" src="" alt="Preview">
+                <button class="close-preview" onclick="closeImagePreview()">&times;</button>
+                <div class="image-preview-actions">
+                    <button class="preview-action-btn" onclick="zoomIn()">➕</button>
+                    <button class="preview-action-btn" onclick="zoomOut()">➖</button>
+                    <button class="preview-action-btn" onclick="downloadPreviewImage()">📥</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -707,6 +813,9 @@
         // Camera settings
         let cameraSettings = [];
         let currentTab = 0;
+        let currentPreviewImage = null;
+        let currentPreviewData = null;
+        let zoomLevel = 1;
 
         function switchTab(tabIndex) {
             currentTab = tabIndex;
@@ -728,8 +837,8 @@
             const dataRef = db.ref('smoking_events');
             dataRef.orderByChild('timestamp').limitToLast(5).on('value', (snapshot) => {
                 const data = snapshot.val();
-                const tableBody = document.getElementById('data-table-body');
-                tableBody.innerHTML = '';
+                const detectionList = document.getElementById('detection-list');
+                detectionList.innerHTML = '';
                 
                 if (data) {
                     const entries = Object.entries(data).reverse();
@@ -737,14 +846,22 @@
                     entries.forEach(([key, entry]) => {
                         const confidencePercent = (entry.confidence * 100).toFixed(0);
                         const typeBadge = getTypeBadge(entry.offense_type);
+                        const itemBadge = getItemBadge(entry.offense_details?.item);
                         
-                        const row = `<tr>
-                                        <td>${formatTime(entry.timestamp)}</td>
-                                        <td>${entry.location}</td>
-                                        <td>${typeBadge}</td>
-                                        <td>${confidencePercent}%</td>
-                                    </tr>`;
-                        tableBody.innerHTML += row;
+                        const detectionItem = document.createElement('div');
+                        detectionItem.className = 'detection-item';
+                        detectionItem.innerHTML = `
+                            <div class="detection-info">
+                                <div class="detection-time">${formatTime(entry.timestamp)}</div>
+                                <div class="detection-location">${entry.location}</div>
+                                <div class="detection-badges">
+                                    ${typeBadge}
+                                    ${itemBadge}
+                                </div>
+                            </div>
+                            <div class="detection-confidence">${confidencePercent}%</div>
+                        `;
+                        detectionList.appendChild(detectionItem);
                     });
 
                     // Update recent image
@@ -760,7 +877,7 @@
                     // Update statistics
                     updateStatistics(data);
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No detection data available</td></tr>';
+                    detectionList.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>No detection data available</p></div>';
                 }
             });
         }
@@ -793,18 +910,20 @@
                 'carrying': 'type-carrying'
             };
             
-            return `<span class="type-badge ${classMap[type] || ''}">${type}</span>`;
+            const displayText = type === 'smoking' ? 'Smoking' : 'Carrying';
+            return `<span class="type-badge ${classMap[type] || ''}">${displayText}</span>`;
         }
 
         function getItemBadge(item) {
-            if (!item) return 'N/A';
+            if (!item) return '';
             
             const classMap = {
                 'cigarette': 'item-cigarette',
                 'vape': 'item-vape'
             };
             
-            return `<span class="item-badge ${classMap[item] || ''}">${item}</span>`;
+            const displayText = item === 'cigarette' ? 'Cigarette' : 'Vape';
+            return `<span class="item-badge ${classMap[item] || ''}">${displayText}</span>`;
         }
 
         function formatDateTime(timestamp) {
@@ -865,7 +984,8 @@
                         const imageItem = document.createElement('div');
                         imageItem.className = 'image-item';
                         imageItem.innerHTML = `
-                            <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image">
+                            <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image" 
+                                 onclick="previewImage('${key}', '${entry.image_base64}', ${entry.confidence}, '${entry.offense_type}', '${entry.offense_details?.item}', '${entry.timestamp}', '${entry.location}')">
                             <div class="image-info">
                                 ${formatTime(entry.timestamp)}<br>
                                 ${typeBadge} ${itemBadge} ${confidencePercent}%
@@ -879,6 +999,69 @@
                 
                 showModal('images-modal');
             });
+        }
+
+        function previewImage(id, imageBase64, confidence, type, item, timestamp, location) {
+            if (id === 'recent') {
+                // Use the recent image data
+                const recentImage = document.getElementById('recent-image');
+                if (recentImage.src) {
+                    currentPreviewImage = recentImage.src;
+                    currentPreviewData = {
+                        confidence: parseFloat(document.getElementById('recent-image').getAttribute('data-confidence')),
+                        type: document.getElementById('recent-image').getAttribute('data-type'),
+                        item: document.getElementById('recent-image').getAttribute('data-item'),
+                        timestamp: document.getElementById('recent-image').getAttribute('data-timestamp'),
+                        location: document.getElementById('recent-image').getAttribute('data-location')
+                    };
+                }
+            } else {
+                // Use the provided data
+                currentPreviewImage = `data:image/jpeg;base64,${imageBase64}`;
+                currentPreviewData = {
+                    confidence: confidence,
+                    type: type,
+                    item: item,
+                    timestamp: timestamp,
+                    location: location
+                };
+            }
+            
+            document.getElementById('preview-image').src = currentPreviewImage;
+            document.getElementById('image-preview-modal').style.display = 'flex';
+            zoomLevel = 1;
+            document.getElementById('preview-image').style.transform = `scale(${zoomLevel})`;
+        }
+
+        function closeImagePreview() {
+            document.getElementById('image-preview-modal').style.display = 'none';
+        }
+
+        function zoomIn() {
+            if (zoomLevel < 3) {
+                zoomLevel += 0.25;
+                document.getElementById('preview-image').style.transform = `scale(${zoomLevel})`;
+            }
+        }
+
+        function zoomOut() {
+            if (zoomLevel > 0.5) {
+                zoomLevel -= 0.25;
+                document.getElementById('preview-image').style.transform = `scale(${zoomLevel})`;
+            }
+        }
+
+        function downloadPreviewImage() {
+            if (!currentPreviewImage || !currentPreviewData) return;
+            
+            const link = document.createElement('a');
+            link.href = currentPreviewImage;
+            const confidencePercent = (currentPreviewData.confidence * 100).toFixed(0);
+            const cleanTimestamp = currentPreviewData.timestamp ? 
+                new Date(currentPreviewData.timestamp).toISOString().replace(/[:.]/g, '-') : 
+                'unknown-time';
+            link.download = `Detection_${currentPreviewData.type}_${currentPreviewData.item || 'unknown'}_${cleanTimestamp}_${confidencePercent}pc.jpg`;
+            link.click();
         }
 
         function downloadData() {
