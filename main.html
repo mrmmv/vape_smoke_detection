@@ -157,11 +157,12 @@
 
         #recent-image {
             width: 100%;
-            height: auto;
+            height: 200px;
             border-radius: 8px;
             cursor: pointer;
             object-fit: cover;
             margin-bottom: 12px;
+            background-color: #f0f0f0;
         }
 
         .view-all-btn {
@@ -215,7 +216,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -280,6 +281,7 @@
             height: 120px;
             border-radius: 60px;
             object-fit: cover;
+            background-color: #f0f0f0;
         }
 
         .developer-details {
@@ -370,6 +372,7 @@
             width: 100%;
             height: 120px;
             object-fit: cover;
+            background-color: #f0f0f0;
         }
 
         .image-info {
@@ -441,6 +444,7 @@
             font-weight: 500;
             color: #666;
             border-bottom: 2px solid transparent;
+            cursor: pointer;
         }
 
         .tab.active {
@@ -603,7 +607,7 @@
         <div class="top-nav">
             <button class="menu-btn" onclick="toggleMenu()">☰</button>
             <img src="https://cdn-icons-png.flaticon.com/256/998/998699.png" alt="Logo" class="logo">
-            <h1>Smoking Detection</h1>
+            <h1>DetecNic</h1>
         </div>
 
         <!-- Main Content -->
@@ -641,10 +645,10 @@
                 <h2>Latest Detection</h2>
                 <img id="recent-image" src="" alt="Recent Image" onclick="previewImage('recent')">
                 <div id="recent-image-info">
-                    <p id="recent-image-time"></p>
-                    <p id="recent-image-location"></p>
-                    <p id="recent-image-type"></p>
-                    <p id="recent-image-item"></p>
+                    <p id="recent-image-time">No detection yet</p>
+                    <p id="recent-image-location">-</p>
+                    <p id="recent-image-type">-</p>
+                    <p id="recent-image-item">-</p>
                 </div>
                 <button class="view-all-btn" onclick="viewAllImages()">View All Images</button>
             </div>
@@ -694,7 +698,7 @@
         </div>
 
         <!-- Developer Info Modal -->
-        <div class="modal-overlay" id="developer-info-modal" style="display: none;">
+        <div class="modal-overlay" id="developer-info-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">Developer Information</h2>
@@ -702,35 +706,33 @@
                 </div>
                 <div class="modal-body">
                     <div class="developer-content">
-                        <img src="src/ayesha.jfif.jpg" alt="Developer Image" class="developer-image">
+                        <img src="" alt="Developer Image" class="developer-image" onerror="this.style.display='none'">
                         <div class="developer-details">
                             <p><strong>Name:</strong> Ayesha I. Maligalig</p>
                             <p><strong>Email:</strong> maligaligayesha21@gmail.com</p>
                             <p><strong>Phone:</strong> +639943763189</p>
                             <p><strong>Role:</strong> Lead Researcher</p>
-                            <p><strong>About:</strong> Ayesha, 14 years old, is a high school student who's passionate about technology and innovation. She attends  Doroteo S. Mendoza Sr. Memorial National High School and enjoys exploring the science behind emerging technologies, with a keen interest in projects that apply AI and IoT for practical health and safety solutions.</p>
+                            <p><strong>About:</strong> Ayesha, 14 years old, is a high school student who's passionate about technology and innovation. She attends Doroteo S. Mendoza Sr. Memorial National High School and enjoys exploring the science behind emerging technologies, with a keen interest in projects that apply AI and IoT for practical health and safety solutions.</p>
                         </div>
-				<div class="modal-body">
+                    </div>
                     <div class="developer-content">
-                        <img src="src/justin.jfif" alt="Developer Image" class="developer-image">
+                        <img src="" alt="Developer Image" class="developer-image" onerror="this.style.display='none'">
                         <div class="developer-details">
                             <p><strong>Name:</strong> Justin Matthew M. Umali</p>
                             <p><strong>Email:</strong> justinumali009@gmail.com</p>
                             <p><strong>Phone:</strong> +639926524030</p>
                             <p><strong>Role:</strong> Researcher</p>
-                            <p><strong>About:</strong> Justin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National High School. He is interested in technology do he learned and make some. 
-stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National High School. He is interested in technology do he learned and make some.</p>
-                      
-                </div>
-				<div class="modal-body">
+                            <p><strong>About:</strong> Justin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National High School. He is interested in technology so he learned and makes some projects.</p>
+                        </div>
+                    </div>
                     <div class="developer-content">
-                        <img src="src/harvey.jfif" alt="Developer Image" class="developer-image">
+                        <img src="" alt="Developer Image" class="developer-image" onerror="this.style.display='none'">
                         <div class="developer-details">
                             <p><strong>Name:</strong> Evan Harvey O. Manalo</p>
                             <p><strong>Email:</strong> harveymanalo12@gmail.com</p>
                             <p><strong>Phone:</strong> +639945007897</p>
                             <p><strong>Role:</strong> Researcher</p>
-                            <p><strong>About:</strong> Harvey is a 13 year old student from Doroteo S. Mendoza SR. Memorial National Highschool.He is very interested in technology and the science behind it.</p>
+                            <p><strong>About:</strong> Harvey is a 13 year old student from Doroteo S. Mendoza SR. Memorial National Highschool. He is very interested in technology and the science behind it.</p>
                         </div>
                     </div>
                 </div>
@@ -738,7 +740,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
         </div>
 
         <!-- Settings Modal -->
-        <div class="modal-overlay" id="settings-modal" style="display: none;">
+        <div class="modal-overlay" id="settings-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">System Settings</h2>
@@ -763,7 +765,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
         </div>
 
         <!-- Data History Modal -->
-        <div class="modal-overlay" id="data-modal" style="display: none;">
+        <div class="modal-overlay" id="data-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">All Detection History</h2>
@@ -790,7 +792,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
         </div>
 
         <!-- Images Modal -->
-        <div class="modal-overlay" id="images-modal" style="display: none;">
+        <div class="modal-overlay" id="images-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">All Detection Images</h2>
@@ -820,6 +822,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCK7sNHt1NCAdT5Oh3UyqANkXmNNSbc138",
             authDomain: "smoke-detection-3c903.firebaseapp.com",
@@ -829,16 +832,19 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             messagingSenderId: "934647950927",
             appId: "1:934647950927:web:ecb337451b9a8b6c2f043a"
         };
+
+        // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Camera settings
+        // Global variables
         let cameraSettings = [];
         let currentTab = 0;
         let currentPreviewImage = null;
         let currentPreviewData = null;
         let zoomLevel = 1;
 
+        // Tab switching function
         function switchTab(tabIndex) {
             currentTab = tabIndex;
             const tabsContent = document.getElementById('tabs-content');
@@ -855,6 +861,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             });
         }
 
+        // Fetch dashboard data from Firebase
         function fetchDashboardData() {
             const dataRef = db.ref('smoking_events');
             dataRef.orderByChild('timestamp').limitToLast(5).on('value', (snapshot) => {
@@ -875,7 +882,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
                         detectionItem.innerHTML = `
                             <div class="detection-info">
                                 <div class="detection-time">${formatTime(entry.timestamp)}</div>
-                                <div class="detection-location">${entry.location}</div>
+                                <div class="detection-location">${entry.location || 'Unknown'}</div>
                                 <div class="detection-badges">
                                     ${typeBadge}
                                     ${itemBadge}
@@ -889,21 +896,38 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
                     // Update recent image
                     if (entries.length > 0) {
                         const recentData = entries[0][1];
-                        document.getElementById('recent-image').src = `data:image/jpeg;base64,${recentData.image_base64}`;
+                        const recentImage = document.getElementById('recent-image');
+                        
+                        if (recentData.image_base64) {
+                            recentImage.src = `data:image/jpeg;base64,${recentData.image_base64}`;
+                            recentImage.setAttribute('data-confidence', recentData.confidence);
+                            recentImage.setAttribute('data-type', recentData.offense_type);
+                            recentImage.setAttribute('data-item', recentData.offense_details?.item || '');
+                            recentImage.setAttribute('data-timestamp', recentData.timestamp);
+                            recentImage.setAttribute('data-location', recentData.location || 'Unknown');
+                        }
+                        
                         document.getElementById('recent-image-time').innerText = `Captured: ${formatDateTime(recentData.timestamp)}`;
-                        document.getElementById('recent-image-location').innerText = `Location: ${recentData.location}`;
+                        document.getElementById('recent-image-location').innerText = `Location: ${recentData.location || 'Unknown'}`;
                         document.getElementById('recent-image-type').innerHTML = `Type: ${getTypeBadge(recentData.offense_type)}`;
                         document.getElementById('recent-image-item').innerHTML = `Item: ${getItemBadge(recentData.offense_details?.item)}`;
+                    } else {
+                        document.getElementById('recent-image-time').innerText = 'No detection yet';
                     }
                     
                     // Update statistics
                     updateStatistics(data);
                 } else {
                     detectionList.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>No detection data available</p></div>';
+                    document.getElementById('recent-image-time').innerText = 'No detection yet';
                 }
+            }, (error) => {
+                console.error("Error fetching data:", error);
+                document.getElementById('detection-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error loading data</p></div>';
             });
         }
 
+        // Update statistics
         function updateStatistics(data) {
             const entries = Object.values(data);
             const totalDetections = entries.length;
@@ -924,6 +948,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             document.getElementById('last-detection-time').innerText = lastDetectionTime;
         }
 
+        // Get type badge HTML
         function getTypeBadge(type) {
             if (!type) return '';
             
@@ -936,6 +961,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             return `<span class="type-badge ${classMap[type] || ''}">${displayText}</span>`;
         }
 
+        // Get item badge HTML
         function getItemBadge(item) {
             if (!item) return '';
             
@@ -948,18 +974,29 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             return `<span class="item-badge ${classMap[item] || ''}">${displayText}</span>`;
         }
 
+        // Format date and time
         function formatDateTime(timestamp) {
             if (!timestamp) return 'N/A';
-            const date = new Date(timestamp);
-            return date.toLocaleString();
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleString();
+            } catch (e) {
+                return 'Invalid Date';
+            }
         }
 
+        // Format time only
         function formatTime(timestamp) {
             if (!timestamp) return 'N/A';
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString();
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString();
+            } catch (e) {
+                return 'Invalid Time';
+            }
         }
 
+        // View all data
         function viewAllData() {
             const dataRef = db.ref('smoking_events');
             dataRef.once('value', (snapshot) => {
@@ -975,7 +1012,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
                         
                         const row = `<tr>
                                         <td>${formatDateTime(entry.timestamp)}</td>
-                                        <td>${entry.location}</td>
+                                        <td>${entry.location || 'Unknown'}</td>
                                         <td>${typeBadge}</td>
                                         <td>${itemBadge}</td>
                                         <td>${confidencePercent}%</td>
@@ -990,6 +1027,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             });
         }
 
+        // View all images
         function viewAllImages() {
             const dataRef = db.ref('smoking_events');
             dataRef.once('value', (snapshot) => {
@@ -1005,14 +1043,27 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
                         
                         const imageItem = document.createElement('div');
                         imageItem.className = 'image-item';
-                        imageItem.innerHTML = `
-                            <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image" 
-                                 onclick="previewImage('${key}', '${entry.image_base64}', ${entry.confidence}, '${entry.offense_type}', '${entry.offense_details?.item}', '${entry.timestamp}', '${entry.location}')">
-                            <div class="image-info">
-                                ${formatTime(entry.timestamp)}<br>
-                                ${typeBadge} ${itemBadge} ${confidencePercent}%
-                            </div>
-                        `;
+                        
+                        if (entry.image_base64) {
+                            imageItem.innerHTML = `
+                                <img src="data:image/jpeg;base64,${entry.image_base64}" alt="Detection image" 
+                                     onclick="previewImage('${key}', '${entry.image_base64}', ${entry.confidence}, '${entry.offense_type}', '${entry.offense_details?.item || ''}', '${entry.timestamp}', '${entry.location || 'Unknown'}')">
+                                <div class="image-info">
+                                    ${formatTime(entry.timestamp)}<br>
+                                    ${typeBadge} ${itemBadge} ${confidencePercent}%
+                                </div>
+                            `;
+                        } else {
+                            imageItem.innerHTML = `
+                                <div style="width:100%; height:120px; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">
+                                    No Image
+                                </div>
+                                <div class="image-info">
+                                    ${formatTime(entry.timestamp)}<br>
+                                    ${typeBadge} ${itemBadge} ${confidencePercent}%
+                                </div>
+                            `;
+                        }
                         imageGrid.appendChild(imageItem);
                     });
                 } else {
@@ -1023,30 +1074,39 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             });
         }
 
+        // Preview image
         function previewImage(id, imageBase64, confidence, type, item, timestamp, location) {
             if (id === 'recent') {
                 // Use the recent image data
                 const recentImage = document.getElementById('recent-image');
-                if (recentImage.src) {
+                if (recentImage.src && recentImage.src !== window.location.href) {
                     currentPreviewImage = recentImage.src;
                     currentPreviewData = {
-                        confidence: parseFloat(document.getElementById('recent-image').getAttribute('data-confidence')),
-                        type: document.getElementById('recent-image').getAttribute('data-type'),
-                        item: document.getElementById('recent-image').getAttribute('data-item'),
-                        timestamp: document.getElementById('recent-image').getAttribute('data-timestamp'),
-                        location: document.getElementById('recent-image').getAttribute('data-location')
+                        confidence: parseFloat(recentImage.getAttribute('data-confidence')) || 0,
+                        type: recentImage.getAttribute('data-type') || '',
+                        item: recentImage.getAttribute('data-item') || '',
+                        timestamp: recentImage.getAttribute('data-timestamp') || '',
+                        location: recentImage.getAttribute('data-location') || ''
                     };
+                } else {
+                    alert('No recent image available');
+                    return;
                 }
             } else {
                 // Use the provided data
-                currentPreviewImage = `data:image/jpeg;base64,${imageBase64}`;
-                currentPreviewData = {
-                    confidence: confidence,
-                    type: type,
-                    item: item,
-                    timestamp: timestamp,
-                    location: location
-                };
+                if (imageBase64) {
+                    currentPreviewImage = `data:image/jpeg;base64,${imageBase64}`;
+                    currentPreviewData = {
+                        confidence: confidence || 0,
+                        type: type || '',
+                        item: item || '',
+                        timestamp: timestamp || '',
+                        location: location || ''
+                    };
+                } else {
+                    alert('No image available for this detection');
+                    return;
+                }
             }
             
             document.getElementById('preview-image').src = currentPreviewImage;
@@ -1055,10 +1115,12 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             document.getElementById('preview-image').style.transform = `scale(${zoomLevel})`;
         }
 
+        // Close image preview
         function closeImagePreview() {
             document.getElementById('image-preview-modal').style.display = 'none';
         }
 
+        // Zoom in
         function zoomIn() {
             if (zoomLevel < 3) {
                 zoomLevel += 0.25;
@@ -1066,6 +1128,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             }
         }
 
+        // Zoom out
         function zoomOut() {
             if (zoomLevel > 0.5) {
                 zoomLevel -= 0.25;
@@ -1073,6 +1136,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             }
         }
 
+        // Download preview image
         function downloadPreviewImage() {
             if (!currentPreviewImage || !currentPreviewData) return;
             
@@ -1086,6 +1150,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             link.click();
         }
 
+        // Download data as Excel
         function downloadData() {
             const table = document.getElementById('all-data-table');
             const ws = XLSX.utils.table_to_sheet(table);
@@ -1094,22 +1159,27 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             XLSX.writeFile(wb, "detection_history.xlsx");
         }
 
+        // Show modal
         function showModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
 
+        // Close modal
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
+        // Toggle menu
         function toggleMenu() {
             showDeveloperInfo();
         }
 
+        // Show developer info
         function showDeveloperInfo() {
             showModal('developer-info-modal');
         }
 
+        // Show settings
         function showSettings() {
             // Load current settings
             db.ref('alert_settings').once('value').then((snapshot) => {
@@ -1140,9 +1210,13 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
                 showModal('settings-modal');
             }).catch(error => {
                 console.error("Error loading settings:", error);
+                // Add default camera on error
+                addCameraSetting();
+                showModal('settings-modal');
             });
         }
 
+        // Add camera setting
         function addCameraSetting() {
             const newSetting = {
                 id: `camera_${Date.now()}`,
@@ -1153,6 +1227,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             addCameraSettingToUI(newSetting, cameraSettings.length - 1);
         }
 
+        // Add camera setting to UI
         function addCameraSettingToUI(setting, index) {
             const container = document.getElementById('camera-settings-container');
             const settingDiv = document.createElement('div');
@@ -1178,7 +1253,13 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             container.appendChild(settingDiv);
         }
 
+        // Remove camera setting
         function removeCameraSetting(id) {
+            if (cameraSettings.length <= 1) {
+                alert('You need at least one camera configured');
+                return;
+            }
+            
             if (confirm('Are you sure you want to remove this camera?')) {
                 cameraSettings = cameraSettings.filter(setting => setting.id !== id);
                 const element = document.getElementById(`camera-${id}`);
@@ -1186,6 +1267,7 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             }
         }
 
+        // Save settings
         function saveSettings() {
             const phoneNumber = document.getElementById('alert-phone').value;
             const updates = {};
@@ -1221,12 +1303,6 @@ stin is a 13 year old researcher from Doroteo S. Mendoza Sr. Memorial National H
             }).catch(error => {
                 alert('Error saving settings: ' + error.message);
             });
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                window.location.href = 'index.html';
-            }
         }
 
         // Initialize the app
